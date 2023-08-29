@@ -1,10 +1,12 @@
 
-import type { RouteGenericInterface } from 'fastify/types/route';
+
+import type { RouteGenericInterface } from 'fastify';
+
 import { Static, Type } from '@sinclair/typebox';
 
-import type { Request, ResultAsync } from '../server/request-handler.js';
-import type { RequestHandler } from '../server/request-handler.js';
-import { Controller } from '../server/controller.decorator.js';
+import type { Request, ResultAsync } from '../http-server/request-handler.js';
+import type { RequestHandler } from '../http-server/request-handler.js';
+
 import { HealthCheckHandler } from './health-check-handler.js';
 
 
@@ -17,21 +19,21 @@ interface Schema extends RouteGenericInterface {
 }
 
 
-@Controller({
-  route: {
-    method: 'GET',
-    url: '/health',
-  },
-})
 export class HealthCheckController implements RequestHandler<Schema> {
 
+  readonly route = {
+    method: 'GET' as const,
+    url: '/health',
+  };
+
+
   constructor(
-    private readonly healthCheckHandler: HealthCheckHandler
+    private readonly healthCheckHandler: HealthCheckHandler,
   ) {
   }
 
 
-  public async handleRequest(
+  async handleRequest(
     request: Request<Schema>
 
   ): ResultAsync<Schema> {

@@ -1,19 +1,29 @@
 
-import type { FastifyReply } from 'fastify/types/reply';
-import type { FastifyRequest } from 'fastify/types/request';
-import type { RouteGenericInterface } from 'fastify/types/route';
-
 import type {
+  FastifyReply,
+  FastifyRequest,
   RawReplyDefaultExpression,
   RawRequestDefaultExpression,
   RawServerDefault,
+  RouteGenericInterface,
+  RouteOptions as FastifyRouteOptions,
 
-} from 'fastify/types/utils';
+} from 'fastify';
 
+export type RouteOptions = Omit<
+  FastifyRouteOptions,
+  'handler'
+>;
+
+export type RequestHandlerConstructor = (
+  new (...args: any) => RequestHandler
+);
 
 export interface RequestHandler <
-  Schema extends RouteGenericInterface
+  Schema extends RouteGenericInterface = {}
 > {
+
+  readonly route: RouteOptions;
 
   handleRequest(
     request: Request<Schema>,

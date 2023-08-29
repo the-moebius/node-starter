@@ -1,16 +1,30 @@
 
-import createLogger, { LoggerOptions } from 'pino';
+import type { LoggerOptions, Logger } from 'pino';
+
+import { pino } from 'pino';
 
 import { IS_DEV } from './common/environment.js';
+import { Maybe } from './types/maybe.js';
 
 
-const options: LoggerOptions = {};
+export function createLogger(
+  options?: Maybe<LoggerOptions>
 
-if (IS_DEV) {
+): Logger {
+
+  options = (options ?? {});
+
   // Using pretty logging in development
-  options.transport = {
-    target: 'pino-pretty'
-  };
-}
+  if (!options.transport && IS_DEV) {
+    options.transport = {
+      target: 'pino-pretty'
+    };
+  }
 
-export const logger = createLogger(options);
+  if (!options.level) {
+    options.level = (IS_DEV ? 'debug' : 'info');
+  }
+
+  return pino(options);
+
+}

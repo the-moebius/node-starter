@@ -1,16 +1,56 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@tsconfig/node-lts-strictest-esm/tsconfig.json",
+
+  // "ts-node" is broken and doesn't support
+  // multiple extended configs, so we have
+  // to hardcode these for now.
+  //
+  //  "extends": [
+  //    "@tsconfig/strictest/tsconfig.json",
+  //    "@tsconfig/node18/tsconfig.json"
+  //  ],
+  //
+
   "compilerOptions": {
+
+    // @tsconfig/strictest/tsconfig.json
+    "strict": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // @tsconfig/node18/tsconfig.json
+    "lib": ["es2023"],
+    // "module": "node16",
+    "target": "es2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    // "moduleResolution": "node16",
+
+    // Local overrides
+    "moduleResolution": "Node",
+    "module": "ESNext",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "outDir": "./dist"
-  },
-  "ts-node": {
-    "esm": true
+    "outDir": "./dist",
+    "checkJs": false,
+
   },
   "files": []
 }

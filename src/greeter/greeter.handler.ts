@@ -1,12 +1,14 @@
 
-import type { RouteGenericInterface } from 'fastify/types/route';
+import type { RouteGenericInterface } from 'fastify';
 
 import { Static, Type } from '@sinclair/typebox'
 
-import type { Request, RequestHandler, Result } from '../framework/server/request-handler.js';
+import type { Request, RequestHandler, Result } from '../framework/http-server/request-handler.js';
 
-import { Controller } from '../framework/server/controller.decorator.js';
+import { Injectable } from '../framework/di/injectable.decorator.js';
+
 import { Greeter } from './greeter.js';
+
 
 
 export const querySchema = Type.Object({
@@ -23,25 +25,25 @@ interface Schema extends RouteGenericInterface {
 }
 
 
-@Controller({
-  route: {
-    method: 'GET',
-    url: '/hello',
+@Injectable()
+export class GreeterHandler implements RequestHandler<Schema> {
+
+  route = {
+    method: 'GET' as const,
+    url: '/greet',
     schema: {
       querystring: querySchema,
       response: {
         200: resultSchema,
       },
     },
-  },
-})
-export class HelloController implements RequestHandler<Schema> {
+  };
 
   constructor(private readonly greeter: Greeter) {
   }
 
 
-  public handleRequest(request: Request<Schema>): Result<Schema> {
+  handleRequest(request: Request<Schema>): Result<Schema> {
 
     request.log.info(`Sending hello response`);
 

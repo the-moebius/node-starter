@@ -1,7 +1,8 @@
 
-import type { FastifyRequest } from 'fastify/types/request';
-import type { FastifyPluginAsync } from 'fastify/types/plugin';
+import type { FastifyRequest, FastifyPluginAsync } from 'fastify';
+
 import { randomUUID } from 'node:crypto';
+
 import fastifyPlugin from 'fastify-plugin';
 
 

@@ -5,7 +5,7 @@ import { Service } from 'typedi';
 @Service()
 export class HealthCheckHandler {
 
-  public async getStatus() {
+  async getStatus() {
 
     await new Promise(resolve => setTimeout(resolve, 500));
 

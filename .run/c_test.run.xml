@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="c/test" type="NodeJSConfigurationType" node-parameters="--loader ts-node/esm" path-to-js-file="src/commands/test.ts" working-dir="$PROJECT_DIR$">
+    <envs>
+      <env name="TS_NODE_PROJECT" value="tsconfig.app.json" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

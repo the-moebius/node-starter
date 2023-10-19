@@ -1,14 +1,16 @@
 
 import { Logger } from 'pino';
+import { Container } from 'inversify';
+
+import type { Maybe } from '../types/maybe.js';
 
 import { Application, ApplicationConfig } from './application.js';
-import { Maybe } from '../types/maybe.js';
-import { Container } from '../di/container.js';
 
 
 export interface ApplicationContextConstruct {
   application: Application;
   config: ApplicationConfig;
+  container: Container;
   logger: Logger;
 }
 
@@ -28,9 +30,8 @@ export class ApplicationContext {
 
     this.application = construct.application;
     this.config = construct.config;
+    this.container = construct.container;
     this.logger = construct.logger;
-
-    this.container = new Container();
 
     this.applicationName = construct.config.name;
 

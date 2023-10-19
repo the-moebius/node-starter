@@ -6,9 +6,34 @@
 
 ## Replacement keys
 
-Replace the following strings with your own:
+Replace the following strings across the entire project
+with your own:
 
-- `node-starter`
+- `node-starter` — name of the project
+
+Then, remove this section.
+
+
+## Environment variables
+
+This project uses dotenv for development configuration.
+Use the provided [.env.dist](./.env.dist) file to initialize
+your local configuration:
+
+```shell
+cp ./.env.dist ./.env
+```
+
+
+## Docker Compose
+
+This project uses [Docker Compose](https://docs.docker.com/compose/)
+to provision development dependencies, like databases, caching layers
+and other services.
+
+Make sure to start services from
+[dev/docker-compose.yml](./dev/docker-compose.yml) file,
+before running the application locally.
 
 
 ## Running from IDE
@@ -16,13 +41,15 @@ Replace the following strings with your own:
 You can run server/commands locally from your IDE:
 
 - Set Node.js argument:
-  `-r ts-node/register`
+  `--loader ts-node/esm`
 
 - Set environment variable:
-  `TS_NODE_PROJECT=tsconfig.build.json`
+  `TS_NODE_PROJECT=tsconfig.app.json`
 
 
 ## License (MIT)
+
+@TODO — DON'T FORGET TO UPDATE THE LICENSE!
 
 Copyright © 2021—2023 Moebius, Slava Fomin II
 

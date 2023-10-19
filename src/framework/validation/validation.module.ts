@@ -12,7 +12,7 @@ export class ValidationModule extends ApplicationModule {
 
     const { container } = this.context;
 
-    container.set(Validator);
+    container.bind(Validator).toSelf();
 
   }
 

@@ -1,16 +1,21 @@
 
-import type { LoggerOptions, Logger } from 'pino';
+import type { LoggerOptions, Logger as LoggerType } from 'pino';
 
 import { pino } from 'pino';
 
+import type { Maybe } from './types/maybe.js';
+
 import { IS_DEV } from './common/environment.js';
-import { Maybe } from './types/maybe.js';
+
+
+export const Logger = Symbol('Logger');
+export type { LoggerType };
 
 
 export function createLogger(
   options?: Maybe<LoggerOptions>
 
-): Logger {
+): LoggerType {
 
   options = (options ?? {});
 

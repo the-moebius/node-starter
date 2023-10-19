@@ -1,5 +1,6 @@
 
-import { Container } from '../di/container.js';
+import { Container } from 'inversify';
+
 import { HttpServer } from './http-server.js';
 import { RequestHandler } from './request-handler.js';
 
@@ -12,7 +13,7 @@ export function registerHandler(
 
   const httpServer = container.get(HttpServer);
 
-  container.set(Handler);
+  container.bind(Handler).toSelf();
 
   httpServer.registerHandler(
     container.get(Handler)

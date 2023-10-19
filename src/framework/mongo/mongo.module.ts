@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 
 import { ConnectOptions as MongooseOptions } from 'mongoose';
 
+import type { Maybe } from '../types/maybe.js';
+
 import { ApplicationModule } from '../application/application-module.js';
 import { MongooseConnection } from './mongoose-connection.js';
-import { Maybe } from '../types/maybe.js';
 
 
 export interface MongoModuleConfig {
@@ -42,9 +43,9 @@ export class MongoModule extends ApplicationModule {
       connectOptions: mongooseOptions,
     });
 
-    container.set(
-      MongooseConnection,
-      this.#mongooseConnection
+    (container
+      .bind(MongooseConnection)
+      .toConstantValue(this.#mongooseConnection)
     );
 
   }

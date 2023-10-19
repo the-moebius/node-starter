@@ -1,14 +1,19 @@
 
 import assert from 'node:assert/strict';
 
-import { Logger, LoggerOptions } from 'pino';
+import type { Context } from 'inversify/lib/planning/context';
+
 import chalk from 'chalk';
+import { LoggerOptions } from 'pino';
+import { Container } from 'inversify';
+
+import type { Values } from '../types/values.js';
+import type { Maybe } from '../types/maybe.js';
+import type { LoggerType } from '../logger.js';
 
 import { ApplicationContext } from './application-context.js';
-import { Values } from '../types/values.js';
 import { ApplicationModule } from './application-module.js';
-import { Maybe } from '../types/maybe.js';
-import { createLogger } from '../logger.js';
+import { createLogger, Logger } from '../logger.js';
 import { createEventEmitter } from '../common/event-emitter.js';
 
 
@@ -53,7 +58,7 @@ export interface StopEvent {
 
 export class Application {
 
-  readonly #logger: Logger;
+  readonly #logger: LoggerType;
   readonly #config: ApplicationConfig;
   readonly #context: ApplicationContext;
 
@@ -71,7 +76,7 @@ export class Application {
 
   }
 
-  get logger(): Logger {
+  get logger(): LoggerType {
 
     return this.#logger;
 
@@ -84,12 +89,18 @@ export class Application {
 
     this.#config = config;
 
-    this.#logger = this.#createLogger();
+    const container = new Container({
+      defaultScope: 'Singleton',
+      autoBindInjectable: true,
+    });
+
+    this.#logger = this.#createLogger(container);
 
     this.#context = new ApplicationContext({
       application: this,
       config,
       logger: this.#logger,
+      container,
     });
 
   }
@@ -194,17 +205,48 @@ export class Application {
   }
 
 
-  #createLogger(): Logger {
-
-    const config = this.#config;
+  #createLogger(container: Container): LoggerType {
 
     const loggerOptions: LoggerOptions = {};
 
-    if (config.name) {
-      loggerOptions.name = config.name;
+    if (this.#config.name) {
+      loggerOptions.name = this.#config.name;
     }
 
-    return createLogger(loggerOptions);
+    const logger = createLogger(loggerOptions);
+
+    (container
+      .bind<LoggerType>(Logger)
+      .toConstantValue(logger)
+      .onActivation(deriveLogger)
+    );
+
+    return logger;
+
+
+    function deriveLogger(
+      context: Context,
+      logger: LoggerType
+
+    ): LoggerType {
+
+      const { serviceIdentifier } = (
+        context.plan.rootRequest
+      );
+
+      if (
+        (typeof serviceIdentifier === 'function') &&
+        ('name' in serviceIdentifier)
+      ) {
+        logger = logger.child({
+          name: serviceIdentifier.name,
+        });
+
+      }
+
+      return logger;
+
+    }
 
   }
 

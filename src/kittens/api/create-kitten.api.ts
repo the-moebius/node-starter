@@ -1,8 +1,8 @@
 
 import { Static, Type } from '@sinclair/typebox';
+import { injectable } from 'inversify';
 
 import { Validator } from '../../framework/validation/validator.js';
-import { Injectable } from '../../framework/di/injectable.decorator.js';
 
 import { KittenSchema } from '../models/kitten.schema.js';
 import { kittenResponse, KittenResponseSchema } from './common/kitten-response.js';
@@ -31,7 +31,7 @@ export namespace CreateKittenApi {
   );
 
 
-  @Injectable()
+  @injectable()
   export class Executor {
 
     constructor(

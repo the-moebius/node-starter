@@ -1,7 +1,6 @@
 
 import { Static, Type } from '@sinclair/typebox';
-
-import { Injectable } from '../../framework/di/injectable.decorator.js';
+import { injectable } from 'inversify';
 
 import { KittensStore } from '../models/kittens.store.js';
 import { kittenResponse, KittenResponseSchema } from './common/kitten-response.js';
@@ -18,7 +17,7 @@ export namespace GetKittensApi {
   );
 
 
-  @Injectable()
+  @injectable()
   export class Executor {
 
     constructor(

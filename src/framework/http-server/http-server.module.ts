@@ -49,7 +49,10 @@ export class HttpServerModule extends ApplicationModule {
 
     await this.httpServer.init();
 
-    container.set(HttpServer, this.#httpServer);
+    (container
+      .bind(HttpServer)
+      .toConstantValue(this.#httpServer)
+    );
 
   }
 

@@ -4,10 +4,12 @@ import type { TObject } from '@sinclair/typebox';
 
 import Ajv from 'ajv';
 import addAjvFormats from 'ajv-formats';
+import { injectable } from 'inversify';
 
 import { ValidationError } from './errors/validation-error.js';
 
 
+@injectable()
 export class Validator {
 
   // @todo make Ajv configurable

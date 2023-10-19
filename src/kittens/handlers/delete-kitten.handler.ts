@@ -2,10 +2,9 @@
 import type { RouteGenericInterface } from 'fastify';
 
 import { Static, Type } from '@sinclair/typebox'
+import { injectable } from 'inversify';
 
 import type { Request, RequestHandler, Result } from '../../framework/http-server/request-handler.js';
-
-import { Injectable } from '../../framework/di/injectable.decorator.js';
 
 import { KittenSchema } from '../models/kitten.schema.js';
 import { DeleteKittenApi } from '../api/delete-kitten.api.js';
@@ -23,7 +22,7 @@ interface Schema extends RouteGenericInterface {
 }
 
 
-@Injectable()
+@injectable()
 export class DeleteKittenHandler
   implements RequestHandler<Schema>
 {

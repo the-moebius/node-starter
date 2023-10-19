@@ -1,4 +1,4 @@
 
-import 'source-map-support/register';
-import 'reflect-metadata';
+import 'source-map-support/register.js';
+import '@abraham/reflection';
 import 'dotenv/config';

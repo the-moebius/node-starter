@@ -30,20 +30,20 @@ export class KittensModule extends ApplicationModule {
     // SERVICES //
     //==========//
 
-    container.set(KittensStore);
+    container.bind(KittensStore).toSelf();
 
-    container.set(GetKittensApi.Executor);
-    container.set(GetKittenApi.Executor);
-    container.set(CreateKittenApi.Executor);
-    container.set(UpdateKittenApi.Executor);
-    container.set(DeleteKittenApi.Executor);
+    container.bind(GetKittensApi.Executor).toSelf();
+    container.bind(GetKittenApi.Executor).toSelf();
+    container.bind(CreateKittenApi.Executor).toSelf();
+    container.bind(UpdateKittenApi.Executor).toSelf();
+    container.bind(DeleteKittenApi.Executor).toSelf();
 
 
     //==========//
     // HANDLERS //
     //==========//
 
-    if (container.has(HttpServer)) {
+    if (container.isBound(HttpServer)) {
       registerHandler(container, GetKittensHandler);
       registerHandler(container, GetKittenHandler);
       registerHandler(container, CreateKittenHandler);

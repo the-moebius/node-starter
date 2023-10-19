@@ -1,9 +1,5 @@
 
-import { Service } from 'typedi';
-
-
-@Service()
-export class HealthCheckHandler {
+export class HealthCheckService {
 
   async getStatus() {
 

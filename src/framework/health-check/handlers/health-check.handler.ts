@@ -4,10 +4,10 @@ import type { RouteGenericInterface } from 'fastify';
 
 import { Static, Type } from '@sinclair/typebox';
 
-import type { Request, ResultAsync } from '../http-server/request-handler.js';
-import type { RequestHandler } from '../http-server/request-handler.js';
+import type { Request, ResultAsync } from '../../http-server/request-handler';
+import type { RequestHandler } from '../../http-server/request-handler';
 
-import { HealthCheckHandler } from './health-check-handler.js';
+import { HealthCheckService } from '../health-check-service';
 
 
 export const resultSchema = Type.Object({
@@ -19,7 +19,7 @@ interface Schema extends RouteGenericInterface {
 }
 
 
-export class HealthCheckController implements RequestHandler<Schema> {
+export class HealthCheckHandler implements RequestHandler<Schema> {
 
   readonly route = {
     method: 'GET' as const,
@@ -28,7 +28,7 @@ export class HealthCheckController implements RequestHandler<Schema> {
 
 
   constructor(
-    private readonly healthCheckHandler: HealthCheckHandler,
+    private readonly healthCheckService: HealthCheckService,
   ) {
   }
 
@@ -38,7 +38,7 @@ export class HealthCheckController implements RequestHandler<Schema> {
 
   ): ResultAsync<Schema> {
 
-    const status = await this.healthCheckHandler.getStatus();
+    const status = await this.healthCheckService.getStatus();
 
     return { status };
 

@@ -1,5 +1,6 @@
 
 import { HydratedDocument } from 'mongoose';
+import { injectable } from 'inversify';
 
 import type { Maybe } from '../../framework/types/maybe.js';
 
@@ -8,6 +9,7 @@ import { DocumentNotFoundError } from '../../framework/mongo/errors/document-not
 import { Kitten, KittenModel } from './kitten.js';
 
 
+@injectable()
 export class KittensStore {
 
   async getKittenById(

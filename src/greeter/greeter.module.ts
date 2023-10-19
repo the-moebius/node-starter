@@ -20,7 +20,7 @@ export class GreeterModule extends ApplicationModule {
     // SERVICES //
     //==========//
 
-    container.set(Greeter);
+    container.bind(Greeter).toSelf();
 
 
     //==========//

@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 
 import { Schema, model } from 'mongoose';
 
-import { Values } from '../../framework/types/values.js';
+import type { Values } from '../../framework/types/values.js';
 
 
 //==================//

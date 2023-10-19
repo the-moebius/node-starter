@@ -2,13 +2,11 @@
 import type { RouteGenericInterface } from 'fastify';
 
 import { Static, Type } from '@sinclair/typebox'
+import { injectable } from 'inversify';
 
 import type { Request, RequestHandler, Result } from '../framework/http-server/request-handler.js';
 
-import { Injectable } from '../framework/di/injectable.decorator.js';
-
 import { Greeter } from './greeter.js';
-
 
 
 export const querySchema = Type.Object({
@@ -25,7 +23,7 @@ interface Schema extends RouteGenericInterface {
 }
 
 
-@Injectable()
+@injectable()
 export class GreeterHandler implements RequestHandler<Schema> {
 
   route = {

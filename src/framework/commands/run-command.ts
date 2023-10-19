@@ -1,11 +1,11 @@
 
 import { Logger } from 'pino';
+import { Container } from 'inversify';
 
 import { CommandModule } from './command.module.js';
 import { startApplication } from '../application/start-application.js';
 import { Application, ApplicationConfig } from '../application/application.js';
 import { ApplicationModule } from '../application/application-module.js';
-import { Container } from '../di/container.js';
 
 
 export interface RunCommandOptions {

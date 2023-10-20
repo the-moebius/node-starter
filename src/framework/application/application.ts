@@ -91,7 +91,6 @@ export class Application {
 
     const container = new Container({
       defaultScope: 'Singleton',
-      autoBindInjectable: true,
     });
 
     this.#logger = this.#createLogger(container);

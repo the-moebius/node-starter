@@ -28,7 +28,9 @@
     "fastify-plugin": "^4.5.1",
     "inversify": "^6.0.1",
     "mongoose": "^7.6.3",
+    "p-limit": "^4.0.0",
     "pino": "^8.16.0",
+    "rxjs": "^7.8.1",
     "source-map-support": "^0.5.21",
     "uuid": "^9.0.1"
   },

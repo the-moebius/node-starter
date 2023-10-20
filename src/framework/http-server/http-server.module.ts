@@ -3,6 +3,7 @@ import type { Maybe } from '../types/maybe.js';
 
 import { ApplicationModule } from '../application/application-module.js';
 import { HttpServer, HttpServerOptions } from './http-server.js';
+import { SseConnectionManager } from './sse/sse-connection-manager.js';
 
 
 export interface HttpServerModuleOptions {
@@ -58,19 +59,26 @@ export class HttpServerModule extends ApplicationModule {
 
   override async start(): Promise<void> {
 
-    this.logger.debug(
-      `Starting the HttpServerModule`
-    );
-
     await this.httpServer.start();
 
   }
 
   override async stop(): Promise<void> {
 
-    this.logger.debug(
-      `Stopping the HttpServerModule`
-    );
+    const { container } = this.context;
+
+    // Closing all SSE connections first,
+    // otherwise they will prevent server from
+    // closing.
+    if (container.isBound(SseConnectionManager)) {
+
+      const sseConnectionManager = container.get(
+        SseConnectionManager
+      );
+
+      await sseConnectionManager.closeAllConnections();
+
+    }
 
     await this.httpServer.stop();
 

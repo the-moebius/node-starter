@@ -202,7 +202,7 @@ export class HttpServer {
       return errorResponse({
         statusCode: 400,
         name: 'ValidationError',
-        message: `Failed to validate the request`,
+        message: (error.message ?? `Failed to validate the request`),
         extra: {
           validation: (
             ('validation' in error) ? error.validation :
@@ -237,8 +237,8 @@ export class HttpServer {
       (error instanceof HttpError)
     ) {
       return errorResponse({
-        statusCode: error.status,
-        name: error.constructor.name,
+        statusCode: error.statusCode,
+        name: (error.name ?? error.constructor.name),
         message: error.message,
       });
 

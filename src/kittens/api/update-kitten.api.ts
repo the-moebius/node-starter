@@ -52,10 +52,10 @@ export namespace UpdateKittenApi {
 
     ): Promise<Response> {
 
-      await this.validator.validateOrThrow(
-        request,
-        RequestSchema
-      );
+      await this.validator.validateOrThrow({
+        data: request,
+        schema: RequestSchema,
+      });
 
       const kitten = (await this.kittensStore
         .getKittenByIdOrThrow(request.id)

@@ -2,11 +2,21 @@
 import type { ValidateFunction } from 'ajv';
 import type { TObject } from '@sinclair/typebox';
 
+import { Static } from '@sinclair/typebox';
 import Ajv from 'ajv';
 import addAjvFormats from 'ajv-formats';
 import { injectable } from 'inversify';
 
+import type { Maybe } from '../types/maybe.js';
+
 import { ValidationError } from './errors/validation-error.js';
+
+
+export interface ValidateOptions<SchemaType extends TObject> {
+  data: unknown;
+  schema: SchemaType;
+  errorMessage?: Maybe<string>;
+}
 
 
 @injectable()
@@ -26,19 +36,42 @@ export class Validator {
 
 
   /**
+   * Validates the specified data using the specified
+   * schema and returns valid data.
+   *
+   * Warning! It could mutate the supplied data. If it's
+   * not acceptable, make a deep copy before calling this
+   * function!
+   *
    * @throws ValidationError on failed validation
    */
-  async validateOrThrow(
-    data: unknown,
-    schema: TObject
+  async validateOrThrow<SchemaType extends TObject>(
+    options: ValidateOptions<SchemaType>
 
-  ): Promise<void> {
+  ): Promise<
+    Static<SchemaType>
+
+  > {
+
+    const {
+      data,
+      schema,
+      errorMessage,
+
+    } = options;
 
     const validator = await this.#getValidator(schema);
 
     if (!validator(data)) {
-      throw new ValidationError(validator.errors ?? []);
+
+      throw new ValidationError({
+        errors: (validator.errors || undefined),
+        message: errorMessage,
+      });
+
     }
+
+    return data as Static<SchemaType>;
 
   }
 

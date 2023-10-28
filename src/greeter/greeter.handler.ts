@@ -41,11 +41,16 @@ export class GreeterHandler implements RequestHandler<Schema> {
   }
 
 
-  handleRequest(request: Request<Schema>): Result<Schema> {
+  async handleRequest(
+    request: Request<Schema>
+
+  ): Promise<Result<Schema>> {
 
     request.log.info(`Sending hello response`);
 
-    const message = this.greeter.greet(request.query.name);
+    const message = await this.greeter.greet(
+      request.query.name
+    );
 
     return {
       message,

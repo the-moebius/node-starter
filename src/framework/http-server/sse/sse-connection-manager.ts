@@ -1,13 +1,14 @@
 
 import { randomUUID } from 'node:crypto';
-import { promisify } from 'node:util';
+import { OutgoingHttpHeaders } from 'node:http';
 
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { inject, injectable } from 'inversify';
 import { finalize } from 'rxjs';
 import pLimit from 'p-limit';
 
 import type { Maybe } from '../../types/maybe.js';
+import type { Values } from '../../types/values.js';
 
 import { Logger, LoggerType } from '../../logger.js';
 import { createSseStream, SseStream } from './sse-stream.js';
@@ -16,7 +17,9 @@ import { serializeSseEvent } from './serialize-sse-event.js';
 
 
 export interface OpenConnectionOptions {
+  request: FastifyRequest;
   reply: FastifyReply;
+  headers?: Maybe<OutgoingHttpHeaders>;
 }
 
 type ConnectionId = string;
@@ -24,12 +27,22 @@ type ConnectionId = string;
 interface Connection {
   id: ConnectionId;
   stream: SseStream;
+  request: FastifyRequest;
   reply: FastifyReply;
   connectedAt: Date;
-  isClosed: boolean;
-  closingPromise?: Maybe<Promise<void>>;
+  state: ConnectionState;
   close: () => Promise<void>;
+  closingPromise?: Maybe<Promise<void>>;
 }
+
+const ConnectionStates = {
+  Open: 'open',
+  Closing: 'closing',
+  Closed: 'closed',
+
+} as const;
+
+type ConnectionState = Values<typeof ConnectionStates>;
 
 
 @injectable()
@@ -51,21 +64,23 @@ export class SseConnectionManager {
   ): Connection {
 
     const logger = this.logger;
+    const connections = this.#connections;
 
-    const { reply } = options;
+    const { request, reply } = options;
 
     const stream = createSseStream();
 
     const connection: Connection = {
-      id: randomUUID(),
+      id: (request.id || randomUUID()),
       stream,
+      request,
       reply,
       connectedAt: new Date(),
-      isClosed: false,
+      state: ConnectionStates.Open,
       close,
     };
 
-    this.#connections.set(connection.id, connection);
+    connections.set(connection.id, connection);
 
     logger.debug(`New SSE connection #${connection.id}`);
 
@@ -76,6 +91,7 @@ export class SseConnectionManager {
       'X-Accel-Buffering': 'no',
       'X-No-Compression': 'yes',
       'Content-Type': 'text/event-stream; charset=utf-8',
+      ...(options.headers ?? {}),
     });
 
     reply.raw.flushHeaders();
@@ -87,14 +103,14 @@ export class SseConnectionManager {
 
     reply.raw.on('close', () => {
 
-      if (!connection.isClosed) {
+      if (connection.state === ConnectionStates.Open) {
 
         logger.debug(
           `Client has closed the SSE connection ` +
           `#${connection.id}`
         );
 
-        void close();
+        void close(true);
 
       }
 
@@ -119,22 +135,43 @@ export class SseConnectionManager {
 
     }
 
-    async function close(): Promise<void> {
+    async function close(
+      isClientClosed = false
 
-      if (!connection.isClosed) {
+    ): Promise<void> {
+
+      if (connection.state === ConnectionStates.Closed) {
+        return;
+      }
+
+      if (connection.state === ConnectionStates.Closing) {
+        return connection.closingPromise;
+      }
+
+      logger.debug(
+        `Closing SSE connection ` +
+        `#${connection.id}`
+      );
+
+      connection.state = ConnectionStates.Closing;
+
+      connection.closingPromise = (async () => {
+
+        if (!isClientClosed) {
+          await terminateConnection();
+        }
+
+        connection.state = ConnectionStates.Closed;
+
+        connections.delete(connection.id);
 
         logger.debug(
-          `Closing SSE connection ` +
-          `#${connection.id}`
+          `Connection #${connection.id} is closed`
         );
 
-        connection.isClosed = true;
+      })();
 
-        subscription.unsubscribe();
-
-        connection.closingPromise = terminateConnection();
-
-      }
+      subscription.unsubscribe();
 
       return connection.closingPromise;
 
@@ -142,9 +179,9 @@ export class SseConnectionManager {
 
     async function terminateConnection(): Promise<void> {
 
-      await promisify(
-        reply.raw.end.bind(reply.raw)
-      )();
+      return new Promise(
+        resolve => reply.raw.end(resolve)
+      );
 
     }
 

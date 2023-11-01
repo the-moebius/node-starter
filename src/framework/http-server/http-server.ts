@@ -1,8 +1,16 @@
 
+import type {
+  FastifyInstance,
+  FastifyRequest,
+  FastifyReply,
+  FastifyHttpOptions,
+
+} from 'fastify';
+
 import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 import assert from 'node:assert/strict';
+import http from 'node:http';
 
 import { Logger } from 'pino';
 import Fastify from 'fastify';
@@ -47,11 +55,15 @@ export type RunState = (
 export interface HttpServerOptions {
   host?: Maybe<string>;
   port?: Maybe<number>;
+  fastifyOptions?: Maybe<
+    FastifyHttpOptions<http.Server>
+  >;
 }
 
 export interface HttpServerResolvedOptions {
   host: string;
   port: number;
+  fastifyOptions?: FastifyHttpOptions<http.Server>;
 }
 
 
@@ -88,6 +100,10 @@ export class HttpServer {
       port: (options?.port ?? 80),
     };
 
+    if (options?.fastifyOptions) {
+      this.#options.fastifyOptions = options?.fastifyOptions;
+    }
+
   }
 
 
@@ -112,8 +128,12 @@ export class HttpServer {
 
     this.#initState = InitStates.Initializing;
 
-    this.#fastify = <any> Fastify({
+    this.#fastify = Fastify<http.Server>({
+
+      ...(this.#options.fastifyOptions ?? {}),
+
       logger: this.#logger,
+
       genReqId: <any> RequestId.useGenerateRequestId({
         readFromRequest: true,
       }),
